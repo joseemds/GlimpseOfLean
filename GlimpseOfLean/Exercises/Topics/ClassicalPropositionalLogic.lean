@@ -57,19 +57,20 @@ def Valid (A : Formula) : Prop := ∅ ⊨ A
 variable {v : Variable → Prop} {A B : Formula}
 @[simp] lemma isTrue_neg : IsTrue v ~A ↔ ¬ IsTrue v A := by simp [neg]
 
-@[simp] lemma isTrue_top : IsTrue v ⊤ := by {
-  sorry
-}
+@[simp] lemma isTrue_top : IsTrue v ⊤ := by simp [top]
 
 @[simp] lemma isTrue_equiv : IsTrue v (A ⇔ B) ↔ (IsTrue v A ↔ IsTrue v B) := by {
-  sorry
+  simp [equiv]
+  tauto
 }
+
 
 /- As an exercise, let's prove (using classical logic) the double negation elimination principle.
   `by_contra h` might be useful to prove something by contradiction. -/
 
 example : Valid (~~A ⇔ A) := by {
-  sorry
+  intro
+  simp
 }
 
 @[simp] lemma satisfies_insert_iff : Satisfies v (insert A Γ) ↔ IsTrue v A ∧ Satisfies v Γ := by {
@@ -136,7 +137,13 @@ example : Provable (~~A ⇔ A) := by {
 
 /- Optional exercise: prove the law of excluded middle. -/
 example : Provable (A || ~A) := by {
-  sorry
+  unfold Provable
+  apply botC
+  apply impE (by apply_ax)
+  apply orI2
+  apply impI
+  apply impE (by apply_ax)
+  apply orI1 (by apply_ax)
 }
 
 /- Optional exercise: prove one of the de-Morgan laws.
@@ -177,7 +184,6 @@ lemma Provable.mp (h1 : Provable (A ⇒ B)) (h2 : Γ ⊢ A) : Γ ⊢ B := by {
 /-- You will want to use the tactics `left` and `right` to prove a disjunction, and the
   tactic `cases h` if `h` is a disjunction to do a case distinction. -/
 theorem soundness_theorem (h : Γ ⊢ A) : Γ ⊨ A := by {
-  sorry
 }
 
 theorem valid_of_provable (h : Provable A) : Valid A := by {
@@ -202,4 +208,3 @@ theorem valid_of_provable (h : Provable A) : Valid A := by {
 -/
 
 end ClassicalPropositionalLogic
-

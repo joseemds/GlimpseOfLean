@@ -64,19 +64,17 @@ def Valid (A : Formula) : Prop := ∅ ⊨ A
 variable {v : Variable → H} {A B : Formula}
 @[simp] lemma eval_neg : eval v ~A = (eval v A)ᶜ := by simp [neg]
 
-@[simp] lemma eval_top : eval v top = ⊤ := by {
-  sorry
-}
+@[simp] lemma eval_top : eval v top = ⊤ := by simp [top]
 
 @[simp]
-lemma isTrue_equiv : eval v (A ⇔ B) = (eval v A ⇨ eval v B) ⊓ (eval v B ⇨ eval v A) := by {
-  sorry
-}
+lemma isTrue_equiv : eval v (A ⇔ B) = (eval v A ⇨ eval v B) ⊓ (eval v B ⇨ eval v A) := by simp [equiv]
 
 /- As an exercise, let's prove the following proposition, which holds in intuitionistic logic. -/
 
 example : Valid (~(A && ~A)) := by {
-  sorry
+  unfold Valid
+  unfold Models
+  simp
 }
 
 /- Let's define provability w.r.t. intuitionistic logic. -/
@@ -123,7 +121,14 @@ macro_rules
 ```
 -/
 example : Provable ((~A || ~B) ⇒ ~(A && B)) := by {
-  sorry
+  apply impI
+  apply impI
+  apply orE (by apply_ax)
+  · apply impE (by apply_ax)
+    apply andE1 (by apply_ax)
+
+  · apply impE (by apply_ax)
+    apply andE2 (by apply_ax)
 }
 
 /- Optional exercise -/
@@ -184,4 +189,3 @@ theorem valid_of_provable (h : Provable A) : Valid A := by {
 -/
 
 end IntuitionisticPropositionalLogic
-
