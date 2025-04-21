@@ -593,11 +593,13 @@ You will probably want to rewrite using `abs_le` in several assumptions as well 
 goal. You can use `rw [abs_le] at *` for this. -/
 example (hu : seq_limit u l) (hw : seq_limit w l) (h : ∀ n, u n ≤ v n) (h' : ∀ n, v n ≤ w n) :
     seq_limit v l := by {
-      intros
-      rw [abs_le]
-
-
-
+      intros ε hε
+      let ⟨n, N⟩ := hw ε hε
+      let ⟨n', N'⟩ := hu ε hε
+      use max n n'
+      intro m hm
+      rw [ge_max_iff] at hm
+      sorry
 }
 
 
@@ -655,7 +657,7 @@ Don’t forget to move the cursor around to see what each `apply?` is proving.
 /-- Extractions take arbitrarily large values for arbitrarily large
 inputs. -/
 lemma extraction_ge : extraction φ → ∀ N N', ∃ n ≥ N', φ n ≥ N := by {
-  sorry
+  intro h
 }
 
 /-- A real number `a` is a cluster point of a sequence `u`

@@ -132,7 +132,15 @@ example : insert A (insert B ∅) ⊢ A && B := by
   exact andI (by apply_ax) (by apply_ax)
 
 example : Provable (~~A ⇔ A) := by {
-  sorry
+  apply andI
+  · apply impI
+    apply botC
+    apply impE _ (by apply_ax)
+    apply_ax
+  · apply impI
+    apply impI
+    apply impE (by apply_ax)
+    apply_ax
 }
 
 /- Optional exercise: prove the law of excluded middle. -/
@@ -162,28 +170,47 @@ example : Provable (~(A && B) ⇔ ~A || ~B) := by {
   You will probably need to use the lemma
   `insert_subset_insert : s ⊆ t → insert x s ⊆ insert x t`. -/
 lemma weakening (h : Γ ⊢ A) (h2 : Γ ⊆ Δ) : Δ ⊢ A := by {
-  sorry
+  induction h generalizing Δ
+  case ax => apply ax; rename_i ih a Γ'; apply h2 Γ'
+  case impI ih₁ ih₂ => apply impI; apply ih₂; apply insert_subset_insert h2;
+  case impE ih₁ ih₂ => apply impE; apply ih₁; apply h2; apply ih₂; exact h2
+  case andI ih₁ ih₂ => apply andI; apply ih₁; exact h2; apply ih₂; exact h2
+  case andE1 ih => apply andE1; apply ih; exact h2;
+  case andE2 ih => apply andE2; apply ih; exact h2;
+  case orI1 ih => apply orI1; apply ih; exact h2
+  case orI2 ih => apply orI2; apply ih; exact h2
+  case orE ih₁ ih₂ ih₃ => apply orE; apply ih₁ h2; apply ih₂ (insert_subset_insert h2); apply ih₃ (insert_subset_insert h2)
+  case botC ih => apply botC; apply ih; apply insert_subset_insert h2
 }
 
 /- Use the `apply?` tactic to find the lemma that states `Γ ⊆ insert x Γ`.
   You can click the blue suggestion in the right panel to automatically apply the suggestion. -/
 
 lemma ProvableFrom.insert (h : Γ ⊢ A) : insert B Γ ⊢ A := by {
-  sorry
+  apply weakening h
+
+  exact subset_insert B Γ
 }
 
 /- Proving the deduction theorem is now easy. -/
 lemma deduction_theorem (h : Γ ⊢ A) : insert (A ⇒ B) Γ ⊢ B := by {
+  apply impE
   sorry
 }
 
 lemma Provable.mp (h1 : Provable (A ⇒ B)) (h2 : Γ ⊢ A) : Γ ⊢ B := by {
-  sorry
+  apply impE _ h2
+  apply weakening h1
+  exact empty_subset Γ
 }
 
 /-- You will want to use the tactics `left` and `right` to prove a disjunction, and the
   tactic `cases h` if `h` is a disjunction to do a case distinction. -/
 theorem soundness_theorem (h : Γ ⊢ A) : Γ ⊨ A := by {
+  induction h
+  case ax => intro a ha; tauto
+  case impI ih => intro v hΓ; simp [isTrue] at ih ⊢;     exact ih (by simp [hΓ])
+
 }
 
 theorem valid_of_provable (h : Provable A) : Valid A := by {
